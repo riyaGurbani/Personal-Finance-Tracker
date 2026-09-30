@@ -3,8 +3,11 @@ import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import { Button, FormControlLabel, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
+import { useAddExpenseState } from './state.js'
 
 function AddExpensePage() {
+  const { paymentMethods, categories, aiSuggestion } = useAddExpenseState()
+
   return (
     <Stack spacing={3}>
       <PageIntro
@@ -27,16 +30,20 @@ function AddExpensePage() {
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField select fullWidth label="Payment Method" defaultValue="upi">
-                  <MenuItem value="upi">UPI</MenuItem>
-                  <MenuItem value="card">Credit Card</MenuItem>
-                  <MenuItem value="cash">Cash</MenuItem>
+                  {paymentMethods.map((method) => (
+                    <MenuItem key={method.value} value={method.value}>
+                      {method.label}
+                    </MenuItem>
+                  ))}
                 </TextField>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField select fullWidth label="Category" defaultValue="food">
-                  <MenuItem value="food">Food & Dining</MenuItem>
-                  <MenuItem value="transport">Transportation</MenuItem>
-                  <MenuItem value="shopping">Shopping</MenuItem>
+                  {categories.map((category) => (
+                    <MenuItem key={category.value} value={category.value}>
+                      {category.label}
+                    </MenuItem>
+                  ))}
                 </TextField>
               </Grid>
               <Grid size={{ xs: 12 }}>
@@ -49,12 +56,12 @@ function AddExpensePage() {
           </SectionCard>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
-          <SectionCard title="AI Suggestion" subtitle="Suggested category: Food & Dining">
+          <SectionCard title={aiSuggestion.title} subtitle={aiSuggestion.subtitle}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <SmartToyRoundedIcon color="primary" />
                 <Typography variant="body2" color="text.secondary">
-                  Confidence: 96% · Reason: Swiggy is commonly associated with food delivery transactions.
+                  {aiSuggestion.description}
                 </Typography>
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>

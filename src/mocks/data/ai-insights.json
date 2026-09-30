@@ -1,0 +1,34 @@
+{
+  "tabs": ["Overview", "Spending Trends", "Anomalies", "Recommendations", "Predictions"],
+  "activeTab": "Overview",
+  "insights": [
+    {
+      "id": 1,
+      "title": "Food expenses increased by 18%",
+      "subtitle": "Your Food & Dining expenses are 18% higher than last month.",
+      "impact": "Financial impact: +₹2,150 · Confidence: 92%",
+      "tone": "primary"
+    },
+    {
+      "id": 2,
+      "title": "Unusual subscriptions",
+      "subtitle": "One subscription has not been actively used but costs ₹1,249 per month.",
+      "impact": "Financial impact: ₹1,249 · Confidence: 87%",
+      "tone": "warning"
+    },
+    {
+      "id": 3,
+      "title": "Weekend spending is 42% higher",
+      "subtitle": "You spend more on weekends than weekdays.",
+      "impact": "Financial impact: ₹780 · Confidence: 76%",
+      "tone": "secondary"
+    },
+    {
+      "id": 4,
+      "title": "Budget risk ahead",
+      "subtitle": "Based on current spending rate, you may exceed your monthly budget by ₹2,800.",
+      "impact": "Financial impact: +₹2,800 · Confidence: 84%",
+      "tone": "secondary"
+    }
+  ]
+}

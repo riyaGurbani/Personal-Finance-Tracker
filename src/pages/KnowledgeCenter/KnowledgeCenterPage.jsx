@@ -2,8 +2,11 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
+import { useKnowledgeCenterState } from './state.js'
 
 function KnowledgeCenterPage() {
+  const { knowledgeItems } = useKnowledgeCenterState()
+
   return (
     <Stack spacing={3}>
       <PageIntro
@@ -13,34 +16,26 @@ function KnowledgeCenterPage() {
 
       <SectionCard title="Knowledge sources" subtitle="Future RAG content hub">
         <Stack spacing={2}>
-          {[
-            'The AI assistant retrieves relevant information from these documents before generating financial recommendations.',
-            'Monthly Budgeting Guide',
-            'Emergency Fund Basics',
-            'Reducing Unnecessary Expenses',
-            'Understanding the 50/30/20 Rule',
-            'Personal Savings Strategies',
-            'Credit Card Management',
-          ].map((item, index) => (
+          {knowledgeItems.map((item) => (
             <Stack
-              key={item}
+              key={item.id}
               direction="row"
               spacing={1.5}
               alignItems="center"
               justifyContent="space-between"
               sx={{
-                p: index === 0 ? 0 : 2,
-                borderRadius: index === 0 ? 0 : 4,
-                border: index === 0 ? 'none' : '1px solid rgba(148,163,184,0.18)',
+                p: item.isIntro ? 0 : 2,
+                borderRadius: item.isIntro ? 0 : 4,
+                border: item.isIntro ? 'none' : '1px solid rgba(148,163,184,0.18)',
               }}
             >
               <Stack direction="row" spacing={1.5} alignItems="center">
-                {index === 0 ? <MenuBookRoundedIcon color="primary" /> : <Box sx={{ width: 28, height: 28, borderRadius: 2, backgroundColor: 'rgba(76,111,255,0.12)' }} />}
+                {item.isIntro ? <MenuBookRoundedIcon color="primary" /> : <Box sx={{ width: 28, height: 28, borderRadius: 2, backgroundColor: 'rgba(76,111,255,0.12)' }} />}
                 <Typography variant="body2" color="text.secondary">
-                  {item}
+                  {item.text}
                 </Typography>
               </Stack>
-              {index === 0 ? null : <Button size="small" variant="outlined">Ask AI</Button>}
+              {item.isIntro ? null : <Button size="small" variant="outlined">Ask AI</Button>}
             </Stack>
           ))}
         </Stack>

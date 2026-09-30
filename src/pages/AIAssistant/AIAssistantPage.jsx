@@ -3,12 +3,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded'
 import { Box, Button, Chip, Grid, Stack, TextField, Typography } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
-
-const suggestedQuestions = [
-  'How much did I spend on dining this month?',
-  'Show unusual expenses from the last 30 days',
-  'What can I do to improve my savings rate?',
-]
+import { useAIAssistantState } from './state.js'
 
 function AssistantIllustration() {
   return (
@@ -31,6 +26,8 @@ function AssistantIllustration() {
 }
 
 function AIAssistantPage() {
+  const { suggestedQuestions } = useAIAssistantState()
+
   return (
     <Stack spacing={3}>
       <PageIntro

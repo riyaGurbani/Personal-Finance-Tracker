@@ -2,8 +2,11 @@ import TuneRoundedIcon from '@mui/icons-material/TuneRounded'
 import { Box, Button, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
+import { useSettingsState } from './state.js'
 
 function SettingsPage() {
+  const { profile, currencies, aiPreferences, privacyMessage } = useSettingsState()
+
   return (
     <Stack spacing={3}>
       <PageIntro
@@ -17,46 +20,35 @@ function SettingsPage() {
             <Stack spacing={2}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="subtitle2">Mohan</Typography>
+                  <Typography variant="subtitle2">{profile.name}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    mohan@example.com
+                    {profile.email}
                   </Typography>
                 </Box>
                 <Button variant="outlined" size="small">
                   Edit
                 </Button>
               </Stack>
-              <TextField select fullWidth label="Currency" defaultValue="inr">
-                <MenuItem value="inr">INR (₹)</MenuItem>
-                <MenuItem value="usd">USD ($)</MenuItem>
+              <TextField select fullWidth label="Currency" defaultValue={profile.currency}>
+                {currencies.map((currency) => (
+                  <MenuItem key={currency.value} value={currency.value}>
+                    {currency.label}
+                  </MenuItem>
+                ))}
               </TextField>
-              <TextField fullWidth label="Monthly Budget" defaultValue="₹ 65000" />
+              <TextField fullWidth label="Monthly Budget" defaultValue={profile.monthlyBudget} />
             </Stack>
           </SectionCard>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <SectionCard title="AI Preferences" subtitle="Visual-only toggles for now">
             <Stack spacing={2}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2">Enable AI categorization</Typography>
-                <Switch defaultChecked />
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2">Enable spending insights</Typography>
-                <Switch defaultChecked />
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2">Enable anomaly detection</Typography>
-                <Switch defaultChecked />
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2">Enable budget predictions</Typography>
-                <Switch defaultChecked />
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2">Enable proactive recommendations</Typography>
-                <Switch defaultChecked />
-              </Stack>
+              {aiPreferences.map((preference) => (
+                <Stack key={preference.id} direction="row" justifyContent="space-between" alignItems="center">
+                  <Typography variant="body2">{preference.label}</Typography>
+                  <Switch defaultChecked={preference.enabled} />
+                </Stack>
+              ))}
             </Stack>
           </SectionCard>
         </Grid>
@@ -65,7 +57,7 @@ function SettingsPage() {
             <Stack direction="row" spacing={1.5} alignItems="center">
               <TuneRoundedIcon color="primary" />
               <Typography variant="body2" color="text.secondary">
-                Manage your data, privacy settings, and account controls here.
+                {privacyMessage}
               </Typography>
             </Stack>
           </SectionCard>

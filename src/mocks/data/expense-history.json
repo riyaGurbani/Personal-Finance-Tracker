@@ -1,0 +1,21 @@
+{
+  "filters": {
+    "search": "",
+    "category": "All Categories",
+    "paymentMethod": "All Payment Methods",
+    "minAmount": "",
+    "maxAmount": ""
+  },
+  "stats": [
+    { "label": "Total Expenses", "value": "₹48,750" },
+    { "label": "Number of Transactions", "value": "28" },
+    { "label": "Average Transaction Value", "value": "₹1,741" }
+  ],
+  "transactions": [
+    { "id": 1, "date": "12 Apr 2025", "merchant": "Swiggy", "category": "Food & Dining", "paymentMethod": "UPI", "amount": "₹450", "aiStatus": "AI Matched" },
+    { "id": 2, "date": "11 Apr 2025", "merchant": "Uber", "category": "Transportation", "paymentMethod": "Credit Card", "amount": "₹320", "aiStatus": "AI Matched" },
+    { "id": 3, "date": "10 Apr 2025", "merchant": "Amazon", "category": "Shopping", "paymentMethod": "Credit Card", "amount": "₹1,099", "aiStatus": "AI Matched" },
+    { "id": 4, "date": "09 Apr 2025", "merchant": "Netflix", "category": "Entertainment", "paymentMethod": "Debit Card", "amount": "₹649", "aiStatus": "AI Matched" },
+    { "id": 5, "date": "09 Apr 2025", "merchant": "Electricity Bill", "category": "Bills & Utilities", "paymentMethod": "Bank Transfer", "amount": "₹1,250", "aiStatus": "AI Matched" }
+  ]
+}
