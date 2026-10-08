@@ -13,26 +13,16 @@ import theme from './theme/theme.js'
 
 const queryClient = new QueryClient()
 
-async function enableMocking() {
-  if (import.meta.env.DEV) {
-    const { worker } = await import('./mocks/browser.js')
-    await worker.start({
-      onUnhandledRequest: 'bypass',
-    })
-  }
-}
-
-enableMocking().then(() => {
-  createRoot(document.getElementById('root')).render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <App />
-          </ThemeProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </StrictMode>,
-  )
-})
+// We now use the real Node.js backend, so MSW mocking is disabled.
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </StrictMode>,
+)
