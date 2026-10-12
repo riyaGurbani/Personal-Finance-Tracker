@@ -3,7 +3,8 @@ import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceW
 import AutoGraphRoundedIcon from '@mui/icons-material/AutoGraphRounded'
 import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded'
 import TrendingDownRoundedIcon from '@mui/icons-material/TrendingDownRounded'
-import { useQuery } from '@tanstack/react-query'
+import { useQueries } from '@tanstack/react-query'
+import { getSummaryInsight } from '../../services/aiInsightService.js'
 import { getDashboardData } from '../../services/dashboardService.js'
 
 const iconMap = {
@@ -14,10 +15,23 @@ const iconMap = {
 }
 
 export function useDashboardState() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: getDashboardData,
+  const results = useQueries({
+    queries: [
+      {
+        queryKey: ['dashboard'],
+        queryFn: getDashboardData,
+      },
+      {
+        queryKey: ['ai-summary-insight'],
+        queryFn: getSummaryInsight,
+        retry: false,
+      },
+    ],
   })
+
+  const dashboardQuery = results[0]
+  const summaryInsightQuery = results[1]
+  const data = dashboardQuery.data
 
   const summaryCards = useMemo(
     () =>
@@ -28,14 +42,27 @@ export function useDashboardState() {
     [data],
   )
 
+  const aiInsight = useMemo(() => {
+    if (summaryInsightQuery.data) {
+      return {
+        title: 'AI Spending Insight',
+        subtitle: summaryInsightQuery.data.title,
+        description: summaryInsightQuery.data.summary,
+        severity: summaryInsightQuery.data.severity,
+      }
+    }
+
+    return data?.aiInsight
+  }, [data?.aiInsight, summaryInsightQuery.data])
+
   return {
     greeting: data?.greeting,
     summaryCards,
     trend: data?.trend,
     categoryBreakdown: data?.categoryBreakdown,
-    aiInsight: data?.aiInsight,
+    aiInsight,
     recentTransactions: data?.recentTransactions || [],
-    isLoading,
-    isError,
+    isLoading: dashboardQuery.isLoading,
+    isError: dashboardQuery.isError,
   }
 }

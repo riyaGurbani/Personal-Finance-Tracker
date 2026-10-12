@@ -4,6 +4,12 @@ import SectionCard from '../../components/common/SectionCard.jsx'
 import SummaryMetricCard from '../../components/common/SummaryMetricCard.jsx'
 import { useDashboardState } from './state.js'
 
+const severityColorMap = {
+  low: 'success',
+  medium: 'warning',
+  high: 'error',
+}
+
 function DashboardPage() {
   const {
     greeting,
@@ -171,6 +177,14 @@ function DashboardPage() {
             subtitle={aiInsight?.subtitle}
           >
             <Stack spacing={2}>
+              {aiInsight?.severity ? (
+                <Chip
+                  label={`Severity: ${aiInsight.severity}`}
+                  color={severityColorMap[aiInsight.severity] || 'default'}
+                  size="small"
+                  sx={{ alignSelf: 'flex-start', textTransform: 'capitalize' }}
+                />
+              ) : null}
               <Typography variant="body2" color="text.secondary">
                 {aiInsight?.description}
               </Typography>

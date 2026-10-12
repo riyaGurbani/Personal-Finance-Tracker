@@ -1,12 +1,21 @@
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
-import { Button, FormControlLabel, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material'
+import { Alert, Button, FormControlLabel, Grid, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
 import { useAddExpenseState } from './state.js'
 
 function AddExpensePage() {
-  const { paymentMethods, categories, aiSuggestion } = useAddExpenseState()
+  const {
+    form,
+    paymentMethods,
+    categories,
+    aiSuggestion,
+    submitMessage,
+    isSaving,
+    updateField,
+    submitExpense,
+  } = useAddExpenseState()
 
   return (
     <Stack spacing={3}>
@@ -17,19 +26,45 @@ function AddExpensePage() {
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
-          <SectionCard title="Expense form" subtitle="Fields are visual only in this POC foundation.">
+          <SectionCard title="Expense form" subtitle="Save expenses to the backend and use them across dashboard and AI flows.">
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Description / Merchant *" placeholder="Swiggy dinner order" />
+                <TextField
+                  fullWidth
+                  label="Description / Merchant *"
+                  placeholder="Swiggy dinner order"
+                  value={form.merchant}
+                  onChange={(event) => updateField('merchant', event.target.value)}
+                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Transaction Date *" placeholder="01-01-2025" />
+                <TextField
+                  fullWidth
+                  type="datetime-local"
+                  label="Transaction Date *"
+                  value={form.date}
+                  onChange={(event) => updateField('date', event.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Amount *" placeholder="₹ 450" />
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Amount *"
+                  placeholder="450"
+                  value={form.amount}
+                  onChange={(event) => updateField('amount', event.target.value)}
+                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField select fullWidth label="Payment Method" defaultValue="upi">
+                <TextField
+                  select
+                  fullWidth
+                  label="Payment Method"
+                  value={form.paymentMethod}
+                  onChange={(event) => updateField('paymentMethod', event.target.value)}
+                >
                   {paymentMethods.map((method) => (
                     <MenuItem key={method.value} value={method.value}>
                       {method.label}
@@ -38,7 +73,13 @@ function AddExpensePage() {
                 </TextField>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField select fullWidth label="Category" defaultValue="food">
+                <TextField
+                  select
+                  fullWidth
+                  label="Category"
+                  value={form.category}
+                  onChange={(event) => updateField('category', event.target.value)}
+                >
                   {categories.map((category) => (
                     <MenuItem key={category.value} value={category.value}>
                       {category.label}
@@ -47,11 +88,34 @@ function AddExpensePage() {
                 </TextField>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <TextField fullWidth multiline minRows={4} label="Notes (Optional)" placeholder="Dinner order with friends" />
+                <TextField
+                  fullWidth
+                  multiline
+                  minRows={4}
+                  label="Notes (Optional)"
+                  placeholder="Dinner order with friends"
+                  value={form.notes}
+                  onChange={(event) => updateField('notes', event.target.value)}
+                />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <FormControlLabel control={<Switch defaultChecked />} label="Enable AI Categorization" />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.isAiCategorized}
+                      onChange={(event) => updateField('isAiCategorized', event.target.checked)}
+                    />
+                  }
+                  label="Enable AI Categorization"
+                />
               </Grid>
+              {submitMessage ? (
+                <Grid size={{ xs: 12 }}>
+                  <Alert severity={submitMessage.includes('successfully') ? 'success' : 'error'}>
+                    {submitMessage}
+                  </Alert>
+                </Grid>
+              ) : null}
             </Grid>
           </SectionCard>
         </Grid>
@@ -66,7 +130,12 @@ function AddExpensePage() {
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                 <Button variant="outlined">Cancel</Button>
-                <Button variant="contained" startIcon={<AddCircleOutlineRoundedIcon />}>
+                <Button
+                  variant="contained"
+                  startIcon={<AddCircleOutlineRoundedIcon />}
+                  onClick={submitExpense}
+                  disabled={isSaving}
+                >
                   Save Expense
                 </Button>
                 <Button variant="outlined">Save and Add Another</Button>
