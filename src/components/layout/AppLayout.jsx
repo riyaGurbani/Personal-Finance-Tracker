@@ -88,14 +88,27 @@ function AppLayout() {
               component={NavLink}
               to={item.path}
               onClick={handleDrawerClose}
-              sx={{ px: 1.25, py: 0.9 }}
+              selected={location.pathname === item.path}
+              sx={{
+                px: 1.25,
+                py: 0.9,
+                borderRadius: 2.5,
+                mb: 0.25,
+                '&.active, &.Mui-selected': {
+                  backgroundColor: (muiTheme) => alpha(muiTheme.palette.primary.main, 0.1),
+                  color: 'primary.main',
+                  '& .MuiListItemIcon-root': { color: 'primary.main' },
+                },
+              }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>
                 <Icon sx={{ fontSize: 20 }} />
               </ListItemIcon>
               <ListItemText
                 primary={item.label}
-                primaryTypographyProps={{ fontWeight: 600, fontSize: 13 }}
+                slotProps={{
+                  primary: { sx: { fontWeight: 600, fontSize: 13 } },
+                }}
               />
             </ListItemButton>
           )
@@ -186,12 +199,14 @@ function AppLayout() {
                 placeholder="Search expenses"
                 size="small"
                 sx={{ width: { xs: '100%', sm: 220, md: 280 }, maxWidth: 320, display: { xs: 'none', sm: 'flex' } }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchRoundedIcon fontSize="small" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchRoundedIcon fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  },
                 }}
               />
               <Chip

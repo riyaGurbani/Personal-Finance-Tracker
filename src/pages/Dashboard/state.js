@@ -4,7 +4,7 @@ import AutoGraphRoundedIcon from '@mui/icons-material/AutoGraphRounded'
 import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded'
 import TrendingDownRoundedIcon from '@mui/icons-material/TrendingDownRounded'
 import { useQueries } from '@tanstack/react-query'
-import { getSummaryInsight } from '../../services/aiInsightService.js'
+import { getAllInsights } from '../../services/aiInsightService.js'
 import { getDashboardData } from '../../services/dashboardService.js'
 
 const iconMap = {
@@ -22,15 +22,15 @@ export function useDashboardState() {
         queryFn: getDashboardData,
       },
       {
-        queryKey: ['ai-summary-insight'],
-        queryFn: getSummaryInsight,
+        queryKey: ['ai-insights'],
+        queryFn: getAllInsights,
         retry: false,
       },
     ],
   })
 
   const dashboardQuery = results[0]
-  const summaryInsightQuery = results[1]
+  const insightsQuery = results[1]
   const data = dashboardQuery.data
 
   const summaryCards = useMemo(
@@ -42,25 +42,41 @@ export function useDashboardState() {
     [data],
   )
 
-  const aiInsight = useMemo(() => {
-    if (summaryInsightQuery.data) {
-      return {
-        title: 'AI Spending Insight',
-        subtitle: summaryInsightQuery.data.title,
-        description: summaryInsightQuery.data.summary,
-        severity: summaryInsightQuery.data.severity,
-      }
+  const aiInsights = useMemo(() => {
+    const aggregatedInsights = insightsQuery.data?.insights || []
+
+    if (aggregatedInsights.length > 0) {
+      return aggregatedInsights.slice(0, 2).map((insight) => ({
+        id: insight.cardType,
+        title: insight.title,
+        description: insight.summary,
+        severity: insight.severity,
+        source: insight.source || insightsQuery.data?.source || 'mock',
+      }))
     }
 
-    return data?.aiInsight
-  }, [data?.aiInsight, summaryInsightQuery.data])
+    if (!data?.aiInsight) {
+      return []
+    }
+
+    return [
+      {
+        id: 'dashboard-fallback-insight',
+        title: data.aiInsight.subtitle,
+        description: data.aiInsight.description,
+        severity: data.aiInsight.severity || 'medium',
+        source: 'dashboard',
+      },
+    ]
+  }, [data?.aiInsight, insightsQuery.data])
 
   return {
     greeting: data?.greeting,
     summaryCards,
     trend: data?.trend,
     categoryBreakdown: data?.categoryBreakdown,
-    aiInsight,
+    aiInsights,
+    insightsGeneratedAt: insightsQuery.data?.generatedAt || null,
     recentTransactions: data?.recentTransactions || [],
     isLoading: dashboardQuery.isLoading,
     isError: dashboardQuery.isError,

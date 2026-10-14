@@ -1,12 +1,35 @@
 import api from './api.js'
 
-export async function getExpenseHistoryData() {
+export async function getExpenseHistoryData(filters = {}) {
+  const params = {
+    page: filters.page || 1,
+    limit: filters.limit || 10,
+    sortBy: filters.sortBy || 'date',
+    order: filters.order || 'desc',
+  }
+
+  if (filters.search) {
+    params.search = filters.search
+  }
+
+  if (filters.category) {
+    params.category = filters.category
+  }
+
+  if (filters.paymentMethod) {
+    params.paymentMethod = filters.paymentMethod
+  }
+
+  if (filters.minAmount) {
+    params.minAmount = filters.minAmount
+  }
+
+  if (filters.maxAmount) {
+    params.maxAmount = filters.maxAmount
+  }
+
   const { data } = await api.get('/expenses', {
-    params: {
-      limit: 20,
-      sortBy: 'date',
-      order: 'desc',
-    },
+    params,
   })
 
   const transactions = data.items.map((item) => ({
@@ -24,11 +47,13 @@ export async function getExpenseHistoryData() {
 
   return {
     filters: {
-      search: '',
-      category: '',
-      paymentMethod: '',
-      minAmount: '',
-      maxAmount: '',
+      search: filters.search || '',
+      category: filters.category || '',
+      paymentMethod: filters.paymentMethod || '',
+      minAmount: filters.minAmount || '',
+      maxAmount: filters.maxAmount || '',
+      sortBy: params.sortBy,
+      order: params.order,
     },
     stats: [
       { label: 'Transactions', value: String(data.pagination.total) },
@@ -36,5 +61,6 @@ export async function getExpenseHistoryData() {
       { label: 'AI Categorized', value: String(aiCategorizedCount) },
     ],
     transactions,
+    pagination: data.pagination,
   }
 }

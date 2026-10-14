@@ -1,6 +1,10 @@
-import { useQueries } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query'
 import { getAIInsightsData } from '../../services/aiInsightsService.js'
-import { getCategoryTrendInsight, getSummaryInsight } from '../../services/aiInsightService.js'
+import {
+  getAllInsights,
+  refreshAllInsights,
+} from '../../services/aiInsightService.js'
 
 const fallbackInsights = {
   tabs: ['Overview', 'Savings', 'Alerts'],
@@ -53,43 +57,99 @@ function mapCategoryTrendInsightToCard(categoryTrendInsight) {
   }
 }
 
+function mapAnomalyInsightToCard(anomalyInsight) {
+  if (!anomalyInsight) {
+    return null
+  }
+
+  return {
+    id: 'anomaly-detection',
+    title: anomalyInsight.title || 'Anomaly Detection',
+    subtitle: `Severity: ${anomalyInsight.severity || 'info'}`,
+    impact: anomalyInsight.summary || 'No anomaly detected.',
+    tone: anomalyInsight.severity === 'high' ? 'warning' : 'info',
+    source: 'backend',
+  }
+}
+
+function mapSavingsOpportunityInsightToCard(savingsOpportunityInsight) {
+  if (!savingsOpportunityInsight) {
+    return null
+  }
+
+  return {
+    id: 'savings-opportunity',
+    title: savingsOpportunityInsight.title || 'Savings Opportunity',
+    subtitle: `Severity: ${savingsOpportunityInsight.severity || 'info'}`,
+    impact: savingsOpportunityInsight.summary || 'No savings opportunity available.',
+    tone: savingsOpportunityInsight.severity === 'high' ? 'warning' : 'info',
+    source: 'backend',
+  }
+}
+
 export function useAIInsightsState() {
+  const queryClient = useQueryClient()
+  const [activeTab, setActiveTab] = useState('Overview')
   const results = useQueries({
     queries: [
+      {
+        queryKey: ['ai-insights'],
+        queryFn: getAllInsights,
+        retry: false,
+      },
       {
         queryKey: ['ai-insights-placeholders'],
         queryFn: getAIInsightsData,
         retry: false,
         staleTime: Infinity,
       },
-      {
-        queryKey: ['ai-summary-insight'],
-        queryFn: getSummaryInsight,
-        retry: false,
-      },
-      {
-        queryKey: ['ai-category-trend-insight'],
-        queryFn: getCategoryTrendInsight,
-        retry: false,
-      },
     ],
   })
 
-  const placeholderInsightsQuery = results[0]
-  const summaryInsightQuery = results[1]
-  const categoryTrendQuery = results[2]
+  const aggregatedInsightsQuery = results[0]
+  const placeholderInsightsQuery = results[1]
 
-  const summaryInsightCard = mapSummaryInsightToCard(summaryInsightQuery.data)
-  const categoryTrendCard = mapCategoryTrendInsightToCard(categoryTrendQuery.data)
+  const aggregatedInsights = aggregatedInsightsQuery.data?.insights || []
+  const realInsights = aggregatedInsights.map((insight) => {
+    if (insight.cardType === 'summary') {
+      return mapSummaryInsightToCard(insight)
+    }
+
+    if (insight.cardType === 'category-trend') {
+      return mapCategoryTrendInsightToCard(insight)
+    }
+
+    if (insight.cardType === 'anomaly-detection') {
+      return mapAnomalyInsightToCard(insight)
+    }
+
+    if (insight.cardType === 'savings-opportunity') {
+      return mapSavingsOpportunityInsightToCard(insight)
+    }
+
+    return null
+  }).filter(Boolean)
+
   const placeholderInsights = placeholderInsightsQuery.data?.insights || fallbackInsights.insights
-  const realInsights = [summaryInsightCard, categoryTrendCard].filter(Boolean)
   const insights = [...realInsights, ...placeholderInsights.filter((insight) => !realInsights.some((realInsight) => realInsight.id === insight.id))]
 
+  const refreshMutation = useMutation({
+    mutationFn: refreshAllInsights,
+    onSuccess: (data) => {
+      queryClient.setQueryData(['ai-insights'], data)
+    },
+  })
+
   return {
-    tabs: placeholderInsightsQuery.data?.tabs || fallbackInsights.tabs,
-    activeTab: placeholderInsightsQuery.data?.activeTab || fallbackInsights.activeTab,
+    tabs: aggregatedInsightsQuery.data?.tabs || placeholderInsightsQuery.data?.tabs || fallbackInsights.tabs,
+    activeTab,
+    setActiveTab,
     insights,
-    isLoading: summaryInsightQuery.isLoading || categoryTrendQuery.isLoading,
-    isError: !summaryInsightCard && !categoryTrendCard && summaryInsightQuery.isError && categoryTrendQuery.isError,
+    generatedAt: aggregatedInsightsQuery.data?.generatedAt || null,
+    source: aggregatedInsightsQuery.data?.source || 'mock',
+    isLoading: aggregatedInsightsQuery.isLoading,
+    isError: realInsights.length === 0 && aggregatedInsightsQuery.isError,
+    isRefreshing: refreshMutation.isPending,
+    refreshInsights: refreshMutation.mutateAsync,
   }
 }
