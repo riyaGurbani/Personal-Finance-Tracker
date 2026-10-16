@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
@@ -8,6 +9,7 @@ import {
   AppBar,
   Avatar,
   Badge,
+  Button,
   BottomNavigation,
   BottomNavigationAction,
   Box,
@@ -214,12 +216,32 @@ function AppLayout() {
                 label="AI Connected"
                 color="success"
                 sx={{
-                  display: { xs: 'none', md: 'inline-flex' },
+                  display: { xs: 'none', lg: 'inline-flex' },
                   height: 32,
                   '& .MuiChip-icon': { color: 'success.main' },
                   backgroundColor: (muiTheme) => alpha(muiTheme.palette.success.main, 0.12),
                 }}
               />
+              <IconButton aria-label="search expenses" sx={{ display: { xs: 'inline-flex', sm: 'none' } }}>
+                <SearchRoundedIcon />
+              </IconButton>
+              <Button
+                component={NavLink}
+                to="/expenses/add"
+                variant="contained"
+                startIcon={<AddRoundedIcon />}
+                sx={{
+                  minWidth: { xs: 0, sm: 'auto' },
+                  px: { xs: 1.25, sm: 2 },
+                  '& .MuiButton-startIcon': {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
+              >
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Add Expense
+                </Box>
+              </Button>
               <IconButton aria-label="notifications">
                 <Badge color="error" variant="dot">
                   <NotificationsNoneRoundedIcon />
@@ -227,7 +249,7 @@ function AppLayout() {
               </IconButton>
               <Stack direction="row" spacing={1.25} alignItems="center">
                 <Avatar sx={{ width: 34, height: 34, bgcolor: 'secondary.main', fontSize: 14 }}>M</Avatar>
-                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
                   <Typography variant="subtitle2">Mohan</Typography>
                 </Box>
               </Stack>
@@ -266,7 +288,7 @@ function AppLayout() {
                 justifyContent: 'space-between',
               }}
             >
-              {navigationItems.slice(0, 5).map((item) => {
+              {[navigationItems[0], navigationItems[1], navigationItems[2], navigationItems[4], navigationItems[6]].map((item) => {
                 const Icon = item.icon
                 return (
                   <BottomNavigationAction

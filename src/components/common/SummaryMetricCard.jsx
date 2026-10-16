@@ -1,6 +1,6 @@
 import { alpha } from '@mui/material/styles'
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded'
-import { Card, CardContent, Stack, Typography } from '@mui/material'
+import { Card, CardContent, Chip, Stack, Typography } from '@mui/material'
 
 function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' }) {
   const IconComponent = icon || TrendingUpRoundedIcon
@@ -16,10 +16,10 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
         <Stack spacing={2.5}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack spacing={0.75}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
                 {title}
               </Typography>
-              <Typography variant="h5">{value}</Typography>
+              <Typography variant="h5" sx={{ letterSpacing: '-0.03em' }}>{value}</Typography>
             </Stack>
             <Stack
               alignItems="center"
@@ -36,9 +36,12 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
               <IconComponent />
             </Stack>
           </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, minHeight: 44 }}>
-            {change}
-          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+            <Chip label="Monthly signal" size="small" variant="outlined" />
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+              {change}
+            </Typography>
+          </Stack>
         </Stack>
       </CardContent>
     </Card>

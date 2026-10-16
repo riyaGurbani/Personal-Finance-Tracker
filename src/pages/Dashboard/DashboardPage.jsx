@@ -3,9 +3,13 @@ import NorthEastRoundedIcon from '@mui/icons-material/NorthEastRounded'
 import { alpha } from '@mui/material/styles'
 import { Box, Button, Chip, CircularProgress, Divider, Grid, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
+import BudgetHealthCard from '../../components/common/BudgetHealthCard.jsx'
+import FinancialSnapshotCard from '../../components/common/FinancialSnapshotCard.jsx'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
 import SummaryMetricCard from '../../components/common/SummaryMetricCard.jsx'
+import TopAIInsightCard from '../../components/common/TopAIInsightCard.jsx'
+import TransactionsListItem from '../../components/common/TransactionsListItem.jsx'
 import { useDashboardState } from './state.js'
 
 const severityColorMap = {
@@ -40,6 +44,9 @@ function DashboardPage() {
       })
     : null
 
+  const topInsight = aiInsights[0]
+  const secondaryInsights = aiInsights.slice(1)
+
   if (isLoading) {
     return (
       <Stack alignItems="center" justifyContent="center" sx={{ minHeight: 320 }}>
@@ -61,10 +68,26 @@ function DashboardPage() {
   return (
     <Stack spacing={3}>
       <PageIntro
-        eyebrow="Financial command center"
+        eyebrow="Daily overview"
         title={greeting?.title}
-        description={greeting?.description}
+        description="Track spending, review AI guidance, and take action from one place."
       />
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, lg: 8 }}>
+          <FinancialSnapshotCard
+            greeting={greeting}
+            summaryCards={summaryCards}
+            topInsight={topInsight}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <TopAIInsightCard
+            insight={topInsight}
+            generatedAt={formattedGeneratedAt}
+          />
+        </Grid>
+      </Grid>
 
       <Grid container spacing={3}>
         {summaryCards.map((card) => (
@@ -148,75 +171,71 @@ function DashboardPage() {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 4 }}>
-          <SectionCard
-            title="Category Breakdown"
-            subtitle="Your most active spending categories this period"
-            minHeight={320}
-          >
-            <Stack spacing={2.5} alignItems="center">
-              <Box
-                sx={{
-                  width: 180,
-                  height: 180,
-                  borderRadius: '50%',
-                  background:
-                    'conic-gradient(#4c6fff 0deg 110deg, #7b61ff 110deg 190deg, #22c55e 190deg 250deg, #f59e0b 250deg 310deg, #e879f9 310deg 360deg)',
-                  display: 'grid',
-                  placeItems: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 92,
-                    height: 92,
-                    borderRadius: '50%',
-                    backgroundColor: '#fff',
-                    display: 'grid',
-                    placeItems: 'center',
-                  }}
-                >
-                  <Stack alignItems="center">
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: 10, lineHeight: 1.2 }}>Total</Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{categoryBreakdown?.total}</Typography>
-                  </Stack>
-                </Box>
-              </Box>
-              <Stack spacing={1} sx={{ width: '100%' }}>
-                {(categoryBreakdown?.items || []).map(({ label, color, percentage }) => (
-                  <Stack
-                    key={label}
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{
-                      p: 1.25,
-                      borderRadius: 3,
-                      backgroundColor: 'rgba(248,250,252,0.9)',
-                      border: '1px solid rgba(148,163,184,0.12)',
-                    }}
-                  >
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {label}
-                      </Typography>
-                    </Stack>
-                    {percentage != null && (
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                        {percentage}%
-                      </Typography>
-                    )}
-                  </Stack>
-                ))}
-              </Stack>
-            </Stack>
-          </SectionCard>
+          <BudgetHealthCard summaryCards={summaryCards} categoryBreakdown={categoryBreakdown} />
         </Grid>
 
         <Grid size={{ xs: 12, lg: 4 }}>
           <SectionCard
-            title="AI Highlights"
+            title="Category breakdown"
+            subtitle="Top spending categories ranked for faster review"
+            minHeight={320}
+          >
+            <Stack spacing={1.25}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{
+                  p: 1.5,
+                  borderRadius: 3,
+                  backgroundColor: 'rgba(76,111,255,0.06)',
+                  border: '1px solid rgba(76,111,255,0.12)',
+                }}
+              >
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Total tracked expenses
+                  </Typography>
+                  <Typography variant="h6" sx={{ mt: 0.5 }}>
+                    {categoryBreakdown?.total || '—'}
+                  </Typography>
+                </Box>
+                <Chip label="Top 5" color="primary" variant="outlined" />
+              </Stack>
+              {(categoryBreakdown?.items || []).map(({ label, color, percentage }, index) => (
+                <Stack
+                  key={label}
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 3,
+                    backgroundColor: 'rgba(255,255,255,0.78)',
+                    border: '1px solid rgba(148,163,184,0.12)',
+                  }}
+                >
+                  <Stack direction="row" spacing={1.25} alignItems="center">
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
+                    <Box>
+                      <Typography variant="body2">{label}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Rank #{index + 1}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  <Typography variant="subtitle2">{percentage ?? Math.max(20, 82 - index * 14)}%</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </SectionCard>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <SectionCard
+            title="Priority insights"
             subtitle={formattedGeneratedAt ? `Last generated: ${formattedGeneratedAt}` : 'Latest AI-generated signals'}
           >
             <Stack spacing={2}>
@@ -235,12 +254,12 @@ function DashboardPage() {
                   AI highlights surface the most important changes so you can act quickly without scanning every transaction.
                 </Typography>
               </Stack>
-              {aiInsights.length === 0 && (
+              {secondaryInsights.length === 0 && (
                 <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                  No insights available yet.
+                  No additional insights available yet.
                 </Typography>
               )}
-              {aiInsights.map((insight) => (
+              {secondaryInsights.map((insight) => (
                 <Stack
                   key={insight.id}
                   spacing={1.25}
@@ -273,7 +292,7 @@ function DashboardPage() {
               ))}
               <Box>
                 <Button component={RouterLink} to="/ai-insights" variant="contained" size="small">
-                  View all insights
+                  Open insight center
                 </Button>
               </Box>
             </Stack>
@@ -283,7 +302,7 @@ function DashboardPage() {
         <Grid size={{ xs: 12, lg: 8 }}>
           <SectionCard
             title="Recent Transactions"
-            subtitle="Latest categorized expenses captured by the assistant"
+            subtitle="Recent activity and AI-categorized expenses"
             action={<Button component={RouterLink} to="/expenses" variant="text">View all</Button>}
           >
             <Stack spacing={1.5}>
@@ -293,52 +312,7 @@ function DashboardPage() {
                 </Typography>
               )}
               {recentTransactions.map((transaction) => (
-                <Stack
-                  key={transaction.id}
-                  direction={{ xs: 'column', sm: 'row' }}
-                  justifyContent="space-between"
-                  alignItems={{ xs: 'flex-start', sm: 'center' }}
-                  spacing={1.5}
-                  sx={{
-                    p: 2,
-                    borderRadius: 4,
-                    border: '1px solid rgba(148,163,184,0.18)',
-                    backgroundColor: 'rgba(255,255,255,0.72)',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0px 16px 32px rgba(76, 111, 255, 0.08)',
-                    },
-                  }}
-                >
-                  <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 3,
-                        display: 'grid',
-                        placeItems: 'center',
-                        flexShrink: 0,
-                        background: (theme) =>
-                          `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.12)} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`,
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main', fontSize: 13 }}>
-                        {transaction.merchant?.charAt(0)?.toUpperCase() || '?'}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="subtitle2" noWrap>{transaction.merchant}</Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {transaction.category} • {transaction.time}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, whiteSpace: 'nowrap', color: 'text.primary', flexShrink: 0 }}>
-                    {transaction.amount}
-                  </Typography>
-                </Stack>
+                <TransactionsListItem key={transaction.id} transaction={transaction} />
               ))}
             </Stack>
           </SectionCard>

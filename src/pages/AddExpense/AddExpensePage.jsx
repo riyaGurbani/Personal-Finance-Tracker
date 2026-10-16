@@ -230,6 +230,7 @@ function AddExpensePage() {
               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                 <Chip label={form.isAiCategorized ? 'AI categorization on' : 'Manual categorization'} color={form.isAiCategorized ? 'secondary' : 'default'} variant="outlined" />
                 <Chip label={form.isRecurring ? 'Recurring expense' : 'One-time expense'} color={form.isRecurring ? 'primary' : 'default'} variant="outlined" />
+                {form.isAiCategorized ? <Chip label="Category auto-filled from backend AI" color="success" variant="outlined" /> : null}
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                 <Button

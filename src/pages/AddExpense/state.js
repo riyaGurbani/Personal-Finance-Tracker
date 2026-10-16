@@ -31,11 +31,20 @@ const initialForm = {
   isRecurring: false,
 }
 
+const initialAiCategory = {
+  category: 'Food & Dining',
+  confidence: null,
+  reason: '',
+  source: 'mock',
+}
+
 export function useAddExpenseState() {
   const [form, setForm] = useState(initialForm)
+  const [aiCategoryResult, setAiCategoryResult] = useState(initialAiCategory)
   const [submitMessage, setSubmitMessage] = useState('')
   const [errors, setErrors] = useState({})
   const clearTimerRef = useRef(null)
+  const lastCategorizationKeyRef = useRef('')
 
   // Auto-clear submitMessage after 4 seconds
   useEffect(() => {
@@ -64,21 +73,103 @@ export function useAddExpenseState() {
     },
   })
 
+  const categorizeExpenseMutation = useMutation({
+    mutationFn: async (payload) => {
+      const { data } = await api.post('/ai/categorize-expense', payload)
+      return data
+    },
+    onSuccess: (data) => {
+      setAiCategoryResult({
+        category: data.category,
+        confidence: data.confidence,
+        reason: data.reason,
+        source: data.source,
+      })
+      setForm((current) => ({
+        ...current,
+        category: data.category,
+      }))
+    },
+  })
+
+  useEffect(() => {
+    async function runCategorization() {
+      if (!form.isAiCategorized) {
+        lastCategorizationKeyRef.current = ''
+        return
+      }
+
+      if (!form.merchant.trim() || !form.amount || Number(form.amount) <= 0) {
+        lastCategorizationKeyRef.current = ''
+        return
+      }
+
+      const requestKey = JSON.stringify({
+        merchant: form.merchant.trim(),
+        amount: Number(form.amount),
+        notes: form.notes.trim(),
+        paymentMethod: form.paymentMethod,
+      })
+
+      if (lastCategorizationKeyRef.current === requestKey || categorizeExpenseMutation.isPending) {
+        return
+      }
+
+      lastCategorizationKeyRef.current = requestKey
+
+      try {
+        await categorizeExpenseMutation.mutateAsync({
+          merchant: form.merchant,
+          amount: Number(form.amount),
+          currency: 'INR',
+          notes: form.notes,
+          paymentMethod: form.paymentMethod,
+        })
+      } catch {
+        lastCategorizationKeyRef.current = ''
+        setAiCategoryResult(initialAiCategory)
+      }
+    }
+
+    const timeoutId = setTimeout(() => {
+      runCategorization()
+    }, 350)
+
+    return () => clearTimeout(timeoutId)
+  }, [
+    form.amount,
+    form.isAiCategorized,
+    form.merchant,
+    form.notes,
+    form.paymentMethod,
+    categorizeExpenseMutation.isPending,
+  ])
+
   const aiSuggestion = useMemo(() => {
     const selectedCategory = categories.find((category) => category.value === form.category)?.label || form.category
+    const confidenceText =
+      typeof aiCategoryResult.confidence === 'number' ? `${Math.round(aiCategoryResult.confidence * 100)}%` : 'N/A'
+
     return {
       title: 'AI Suggestion',
       subtitle: `Suggested category: ${selectedCategory}`,
       description:
-        form.merchant.trim().length > 0
-          ? `Confidence: 96% · Reason: ${form.merchant} appears related to ${selectedCategory.toLowerCase()} expenses.`
-          : 'Confidence: 96% · Reason: Merchant patterns can be used to suggest a likely category.',
+        form.isAiCategorized
+          ? form.merchant.trim().length > 0
+            ? `Confidence: ${confidenceText} · Reason: ${aiCategoryResult.reason || 'Waiting for AI categorization.'}`
+            : 'Enter merchant and amount to get an AI category suggestion.'
+          : 'AI categorization is off. You can choose the category manually.',
     }
-  }, [form.category, form.merchant])
+  }, [aiCategoryResult.confidence, aiCategoryResult.reason, form.category, form.isAiCategorized, form.merchant])
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: '' }))
+
+    if (field === 'isAiCategorized' && !value) {
+      lastCategorizationKeyRef.current = ''
+      setAiCategoryResult(initialAiCategory)
+    }
   }
 
   function validateForm() {
@@ -120,10 +211,10 @@ export function useAddExpenseState() {
       notes: form.notes,
       isAiCategorized: form.isAiCategorized,
       isRecurring: form.isRecurring,
-      aiCategorySuggestion: form.isAiCategorized ? form.category : null,
-      aiCategoryConfidence: form.isAiCategorized ? 0.96 : null,
+      aiCategorySuggestion: form.isAiCategorized ? aiCategoryResult.category || form.category : null,
+      aiCategoryConfidence: form.isAiCategorized ? aiCategoryResult.confidence : null,
       aiCategoryReason: form.isAiCategorized
-        ? `${form.merchant || 'This merchant'} appears related to ${form.category.toLowerCase()}.`
+        ? aiCategoryResult.reason || `${form.merchant || 'This merchant'} was categorized by AI.`
         : null,
     }
 
@@ -137,11 +228,13 @@ export function useAddExpenseState() {
     aiSuggestion,
     submitMessage,
     errors,
-    isSaving: saveExpenseMutation.isPending,
+    isSaving: saveExpenseMutation.isPending || categorizeExpenseMutation.isPending,
     updateField,
     submitExpense,
     resetForm: () => {
+      lastCategorizationKeyRef.current = ''
       setForm(initialForm)
+      setAiCategoryResult(initialAiCategory)
       setErrors({})
       setSubmitMessage('')
     },
