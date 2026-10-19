@@ -1,8 +1,8 @@
 export function useSettingsState() {
   return {
     profile: {
-      name: 'Mohan',
-      email: 'mohan@example.com',
+      name: 'Riya',
+      email: 'riya@example.com',
       currency: 'inr',
       monthlyBudget: '₹ 65000',
     },

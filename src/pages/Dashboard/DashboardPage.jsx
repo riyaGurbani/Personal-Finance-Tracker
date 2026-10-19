@@ -79,14 +79,30 @@ function DashboardPage() {
             greeting={greeting}
             summaryCards={summaryCards}
             topInsight={topInsight}
+            onPrimaryAction={() => {
+              // Navigate to Add Expense page
+              window.location.href = '/expenses/add'
+            }}
+            onSecondaryAction={() => {
+              // Navigate to AI Assistant page
+              window.location.href = '/ai-assistant'
+            }}
           />
         </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <TopAIInsightCard
-            insight={topInsight}
-            generatedAt={formattedGeneratedAt}
-          />
-        </Grid>
+         <Grid size={{ xs: 12, lg: 4 }}>
+           <TopAIInsightCard
+             insight={topInsight}
+             generatedAt={formattedGeneratedAt}
+             onReview={() => {
+               // Navigate to full AI Insights page
+               window.location.href = '/ai-insights'
+             }}
+             onAskAi={() => {
+               // Navigate to AI Assistant chat for deeper explanation
+               window.location.href = '/ai-assistant'
+             }}
+           />
+         </Grid>
       </Grid>
 
       <Grid container spacing={3}>

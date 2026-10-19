@@ -37,7 +37,7 @@ function AIAssistantPage() {
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 7 }}>
-          <SectionCard title="Hello Mohan 👋" subtitle="I can analyze your expenses history, explain spending patterns, compare budgets, and provide financial guidance.">
+          <SectionCard title="Hello Riya 👋" subtitle="I can analyze your expenses history, explain spending patterns, compare budgets, and provide financial guidance.">
             <Stack spacing={3}>
                <Stack spacing={1.5}>
                 <Typography variant="subtitle2">Suggested questions</Typography>
