@@ -1,5 +1,10 @@
 import api from './api.js'
 
+export async function getAiHealth() {
+  const { data } = await api.get('/ai/health')
+  return data
+}
+
 export async function getAllInsights() {
   const { data } = await api.get('/ai/insights')
   return data

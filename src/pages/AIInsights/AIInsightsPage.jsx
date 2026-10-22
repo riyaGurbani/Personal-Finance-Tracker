@@ -1,7 +1,7 @@
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
-import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import { alpha } from '@mui/material/styles'
 import { Alert, Box, Button, Chip, CircularProgress, Grid, Stack, Typography } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
@@ -23,16 +23,20 @@ function formatGeneratedAt(value) {
 function AIInsightsPage() {
   const {
     tabs, activeTab, setActiveTab, insights, generatedAt,
-    source, isLoading, isError, isRefreshing, refreshInsights,
+    source, provider, fallbackUsed, health, isLoading, isError, healthError, isRefreshing, refreshInsights,
   } = useAIInsightsState()
 
   const filteredInsights = activeTab === 'Overview'
     ? insights
     : insights.filter((insight) => {
-        if (activeTab === 'Alerts') return insight.tone === 'warning'
-        if (activeTab === 'Savings') return insight.id === 'savings-opportunity' || insight.tone === 'info'
+        if (activeTab === 'Alerts') return insight.severity === 'high' || insight.type === 'anomaly-detection'
+        if (activeTab === 'Savings') return insight.type === 'savings-opportunity'
         return true
       })
+
+  const healthStatus = health?.status || 'unknown'
+  const isHealthy = healthStatus === 'ok'
+  const healthSeverity = isHealthy ? 'success' : healthStatus === 'degraded' ? 'warning' : 'info'
 
   if (isLoading) {
     return (
@@ -58,6 +62,20 @@ function AIInsightsPage() {
         description="Review trends, anomalies, predictions, and savings opportunities identified from your expense data."
       />
 
+      <Alert severity={healthSeverity} icon={isHealthy ? <CheckCircleRoundedIcon fontSize="inherit" /> : undefined}>
+        <Stack spacing={0.5}>
+          <Typography variant="body2">
+            AI status: <strong>{healthStatus}</strong> · Provider: <strong>{provider}</strong>
+            {health?.model ? <> · Model: <strong>{health.model}</strong></> : null}
+          </Typography>
+          {health?.message ? <Typography variant="body2">{health.message}</Typography> : null}
+          {health?.fallbackProvider ? (
+            <Typography variant="body2">Fallback provider: <strong>{health.fallbackProvider}</strong></Typography>
+          ) : null}
+          {healthError ? <Typography variant="body2">Unable to load AI health details.</Typography> : null}
+        </Stack>
+      </Alert>
+
       <SectionCard title="Insights status" subtitle="Track freshness and regenerate the latest AI insight set.">
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }}>
           <Stack spacing={1}>
@@ -65,7 +83,9 @@ function AIInsightsPage() {
               Last generated: {formatGeneratedAt(generatedAt)}
             </Typography>
             <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-              <Chip label={source === 'mock' ? 'Source: Placeholder' : 'Source: Live backend'} color={source === 'mock' ? 'default' : 'primary'} variant="outlined" />
+              <Chip label={`Source: ${source === 'ai' ? 'AI' : 'Mock'}`} color={source === 'ai' ? 'primary' : 'default'} variant="outlined" />
+              <Chip label={`Provider: ${provider}`} color="secondary" variant="outlined" />
+              <Chip label={fallbackUsed ? 'Fallback used' : 'Direct AI response'} color={fallbackUsed ? 'warning' : 'success'} variant="outlined" />
               <Chip label={`${insights.length} insight${insights.length !== 1 ? 's' : ''}`} color="secondary" variant="outlined" />
             </Stack>
           </Stack>
@@ -82,7 +102,13 @@ function AIInsightsPage() {
 
       {source === 'mock' && (
         <Alert severity="info">
-          These are placeholder insights. Click <strong>Refresh Insights</strong> to generate live AI insights from your expense history.
+          These insights are currently coming from the mock fallback path. Refresh again after Ollama is available to generate live AI insights.
+        </Alert>
+      )}
+
+      {fallbackUsed && source === 'ai' && (
+        <Alert severity="warning">
+          Some insights may have used fallback handling during generation. Review the provider and health status above.
         </Alert>
       )}
 
@@ -111,10 +137,8 @@ function AIInsightsPage() {
           </Grid>
         )}
         {filteredInsights.map((insight) => {
-          const icon = insight.tone === 'warning' ? <WarningAmberRoundedIcon color="warning" /> : <PsychologyAltRoundedIcon color="secondary" />
-          const subtitleText = insight.subtitle?.startsWith('Severity:')
-            ? (severityLabelMap[insight.tone] || severityLabelMap[insight.severity] || 'Informational')
-            : insight.subtitle
+          const icon = insight.severity === 'high' ? <WarningAmberRoundedIcon color="warning" /> : <PsychologyAltRoundedIcon color="secondary" />
+          const subtitleText = severityLabelMap[insight.severity] || 'Informational'
 
           return (
             <Grid key={insight.id} size={{ xs: 12, md: 6 }}>
@@ -130,21 +154,18 @@ function AIInsightsPage() {
                   >
                     <Stack direction="row" spacing={1.5} alignItems="flex-start">
                       {icon}
-                      <Typography variant="body2" color="text.secondary">{insight.impact}</Typography>
+                      <Typography variant="body2" color="text.secondary">{insight.summary}</Typography>
                     </Stack>
                   </Box>
                   <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                    <Chip label={insight.source === 'backend' ? 'Live insight' : 'Placeholder'} size="small" color={insight.source === 'backend' ? 'primary' : 'default'} variant="outlined" />
-                    <Chip label={insight.tone === 'warning' ? 'Needs attention' : 'Opportunity'} size="small" color={insight.tone === 'warning' ? 'warning' : 'secondary'} variant="outlined" />
+                    <Chip label={`Type: ${insight.type}`} size="small" color="primary" variant="outlined" />
+                    <Chip label={`Source: ${insight.source}`} size="small" color={insight.source === 'ai' ? 'success' : 'default'} variant="outlined" />
+                    <Chip label={`Provider: ${insight.provider}`} size="small" color="secondary" variant="outlined" />
+                    <Chip label={insight.fallbackUsed ? 'Fallback used' : 'Direct'} size="small" color={insight.fallbackUsed ? 'warning' : 'success'} variant="outlined" />
                   </Stack>
-                  <Stack direction="row" spacing={1.5}>
-                    <Button variant="contained" size="small" startIcon={<TipsAndUpdatesRoundedIcon />} onClick={() => refreshInsights()}>
-                      Explain insight
-                    </Button>
-                    <Button variant="outlined" size="small" href="/expenses">
-                      Track this
-                    </Button>
-                  </Stack>
+                  <Typography variant="caption" color="text.secondary">
+                    Generated: {formatGeneratedAt(insight.generatedAt || generatedAt)}
+                  </Typography>
                 </Stack>
               </SectionCard>
             </Grid>
