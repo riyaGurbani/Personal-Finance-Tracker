@@ -32,6 +32,7 @@ import {
 } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
 import { getPageTitle, navigationItems } from './navigation.js'
+import AIProviderSelect from './AIProviderSelect.jsx'
 
 const drawerWidth = 280
 
@@ -234,6 +235,9 @@ function AppLayout() {
             </Stack>
 
             <Stack direction="row" spacing={1.25} alignItems="center" sx={{ justifyContent: 'flex-end' }}>
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <AIProviderSelect />
+              </Box>
               <Button
                 variant="outlined"
                 startIcon={<CalendarTodayRoundedIcon />}

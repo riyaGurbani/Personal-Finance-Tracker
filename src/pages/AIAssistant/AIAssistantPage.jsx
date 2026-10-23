@@ -26,7 +26,7 @@ function AssistantIllustration() {
 }
 
 function AIAssistantPage() {
-  const { suggestedQuestions, input, setInput, messages, sendQuestion, isLoading } = useAIAssistantState()
+  const { suggestedQuestions, input, setInput, messages, sendQuestion, isLoading, selectedProviderId } = useAIAssistantState()
 
   return (
     <Stack spacing={3}>
@@ -91,12 +91,20 @@ function AIAssistantPage() {
                        }}
                      >
                        <Typography variant="body2">{msg.text}</Typography>
+                       {msg.role === 'assistant' && msg.provider ? (
+                         <Chip
+                           label={`Provider: ${msg.provider}`}
+                           size="small"
+                           variant="outlined"
+                           sx={{ mt: 1, bgcolor: 'background.paper' }}
+                         />
+                       ) : null}
                      </Box>
                    </Stack>
                  ))}
                  {isLoading && (
                    <Typography variant="caption" color="text.secondary">
-                     Analyzing your expenses...
+                     Analyzing your expenses with {selectedProviderId}...
                    </Typography>
                  )}
                </Paper>

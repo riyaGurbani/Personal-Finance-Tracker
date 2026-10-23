@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { askAssistant } from '../../services/aiAssistantService.js'
+import { useAIProvider } from '../../context/useAIProvider.js'
 
 const defaultSuggestions = [
   'How much did I spend on dining this month?',
@@ -11,11 +12,23 @@ const defaultSuggestions = [
 export function useAIAssistantState() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
+  const { selectedProviderId, showError } = useAIProvider()
 
   const mutation = useMutation({
     mutationFn: askAssistant,
     onSuccess: (data) => {
-      setMessages((prev) => [...prev, { role: 'assistant', text: data.answer }])
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          text: data.answer,
+          provider: data.provider || selectedProviderId,
+          source: data.source || 'mock',
+        },
+      ])
+    },
+    onError: (error) => {
+      showError(error?.response?.data?.message || 'Failed to get AI response.')
     },
   })
 
@@ -25,7 +38,7 @@ export function useAIAssistantState() {
 
     setMessages((prev) => [...prev, { role: 'user', text: question }])
     setInput('')
-    mutation.mutate(question)
+    mutation.mutate({ provider: selectedProviderId, message: question })
   }
 
   return {
@@ -34,7 +47,8 @@ export function useAIAssistantState() {
     setInput,
     messages,
     sendQuestion,
-    isLoading: mutation.isLoading,
+    selectedProviderId,
+    isLoading: mutation.isPending,
     isError: mutation.isError,
   }
 }
