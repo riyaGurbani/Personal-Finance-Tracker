@@ -1,5 +1,6 @@
 import { alpha } from '@mui/material/styles'
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded'
+import SouthRoundedIcon from '@mui/icons-material/SouthRounded'
 import { Card, CardContent, Chip, Stack, Typography } from '@mui/material'
 
 function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' }) {
@@ -13,13 +14,15 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Stack spacing={2.5}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack spacing={0.75}>
+        <Stack spacing={2.25}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
+            <Stack spacing={0.75} sx={{ minWidth: 0 }}>
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
                 {title}
               </Typography>
-              <Typography variant="h5" sx={{ letterSpacing: '-0.03em' }}>{value}</Typography>
+              <Typography variant="h5" sx={{ letterSpacing: '-0.03em' }}>
+                {value}
+              </Typography>
             </Stack>
             <Stack
               alignItems="center"
@@ -31,13 +34,14 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
                 color,
                 backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
                 boxShadow: (theme) => `inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`,
+                flexShrink: 0,
               }}
             >
               <IconComponent />
             </Stack>
           </Stack>
           <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
-            <Chip label="Monthly signal" size="small" variant="outlined" />
+            <Chip label="Monthly signal" size="small" variant="outlined" icon={<SouthRoundedIcon sx={{ transform: 'rotate(180deg)' }} />} />
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
               {change}
             </Typography>

@@ -1,4 +1,3 @@
-import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded'
 import FilterAltOffRoundedIcon from '@mui/icons-material/FilterAltOffRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded'

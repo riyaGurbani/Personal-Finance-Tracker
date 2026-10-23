@@ -32,8 +32,10 @@ function TransactionsListItem({ transaction }) {
           <Chip icon={<SmartToyRoundedIcon />} label="AI tagged" size="small" variant="outlined" />
         </Stack>
       </Stack>
-      <Stack alignItems="flex-end" spacing={0.5}>
-        <Typography variant="subtitle2">{transaction?.amount}</Typography>
+      <Stack alignItems="flex-end" spacing={0.5} sx={{ flexShrink: 0 }}>
+        <Typography variant="subtitle2" sx={{ color: transaction?.amountValue > 0 ? 'error.main' : 'text.primary' }}>
+          {transaction?.amount}
+        </Typography>
         <IconButton size="small" aria-label="transaction actions">
           <MoreHorizRoundedIcon fontSize="small" />
         </IconButton>

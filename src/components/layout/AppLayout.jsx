@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded'
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
@@ -9,10 +11,10 @@ import {
   AppBar,
   Avatar,
   Badge,
-  Button,
   BottomNavigation,
   BottomNavigationAction,
   Box,
+  Button,
   Chip,
   Divider,
   Drawer,
@@ -51,14 +53,14 @@ function AppLayout() {
   }
 
   const drawerContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
-      <Stack spacing={1.5} sx={{ px: 1, py: 1.5 }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 1.75 }}>
+      <Stack spacing={2} sx={{ px: 1, py: 1.25 }}>
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Box
             sx={{
-              width: 42,
-              height: 42,
-              borderRadius: 2.5,
+              width: 44,
+              height: 44,
+              borderRadius: 3,
               display: 'grid',
               placeItems: 'center',
               color: 'common.white',
@@ -70,10 +72,10 @@ function AppLayout() {
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-              AI Expense Copilot
+              Expense Copilot
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Personal finance tracker
+              AI Personal Finance
             </Typography>
           </Box>
         </Stack>
@@ -92,10 +94,10 @@ function AppLayout() {
               onClick={handleDrawerClose}
               selected={location.pathname === item.path}
               sx={{
-                px: 1.25,
-                py: 0.9,
+                px: 1.5,
+                py: 1.1,
                 borderRadius: 2.5,
-                mb: 0.25,
+                mb: 0.5,
                 '&.active, &.Mui-selected': {
                   backgroundColor: (muiTheme) => alpha(muiTheme.palette.primary.main, 0.1),
                   color: 'primary.main',
@@ -121,19 +123,44 @@ function AppLayout() {
         sx={{
           p: 2,
           borderRadius: 4,
+          border: '1px solid rgba(219,228,255,0.95)',
           background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.12)} 0%, ${alpha(
             theme.palette.secondary.main,
             0.12,
           )} 100%)`,
         }}
       >
-        <Typography variant="subtitle2" sx={{ mb: 0.75 }}>
-          AI guidance ready
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Ask smarter questions about spending, savings, and financial habits.
-        </Typography>
+        <Stack spacing={1.25}>
+          <Box
+            sx={{
+              width: 42,
+              height: 42,
+              borderRadius: 3,
+              display: 'grid',
+              placeItems: 'center',
+              bgcolor: 'rgba(255,255,255,0.7)',
+            }}
+          >
+            <SmartToyRoundedIcon color="primary" />
+          </Box>
+          <Typography variant="subtitle2">AI is here to help</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Ask smart questions about spending, savings, and more.
+          </Typography>
+          <Button variant="contained" component={NavLink} to="/ai-assistant" sx={{ alignSelf: 'flex-start' }}>
+            Chat with AI
+          </Button>
+        </Stack>
       </Box>
+
+      <Stack spacing={0.25} sx={{ px: 1, pt: 2 }}>
+        <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main' }}>
+          Expense Copilot
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Smarter spending. Brighter tomorrow.
+        </Typography>
+      </Stack>
     </Box>
   )
 
@@ -160,7 +187,7 @@ function AppLayout() {
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
-              p: 1.5,
+              p: 1,
             },
           }}
         >
@@ -172,35 +199,22 @@ function AppLayout() {
         <AppBar position="sticky" elevation={0}>
           <Toolbar
             sx={{
-              minHeight: 72,
+              minHeight: 80,
               px: { xs: 2, md: 3, lg: 4 },
               gap: 2,
               justifyContent: 'space-between',
             }}
           >
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
               {!isLargeScreen ? (
                 <IconButton onClick={handleDrawerToggle} edge="start" aria-label="open navigation">
                   <MenuRoundedIcon />
                 </IconButton>
               ) : null}
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="h6" noWrap>
-                  {pageTitle}
-                </Typography>
-              </Box>
-            </Stack>
-
-            <Stack
-              direction="row"
-              spacing={1.5}
-              alignItems="center"
-              sx={{ flexGrow: 1, justifyContent: 'flex-end' }}
-            >
               <TextField
-                placeholder="Search expenses"
+                placeholder="Search expenses, categories, or ask anything..."
                 size="small"
-                sx={{ width: { xs: '100%', sm: 220, md: 280 }, maxWidth: 320, display: { xs: 'none', sm: 'flex' } }}
+                sx={{ width: '100%', maxWidth: 420, display: { xs: 'none', sm: 'flex' } }}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -208,23 +222,32 @@ function AppLayout() {
                         <SearchRoundedIcon fontSize="small" />
                       </InputAdornment>
                     ),
+                    endAdornment: (
+                      <Chip label="⌘K" size="small" sx={{ height: 24, borderRadius: 2, bgcolor: 'rgba(148,163,184,0.12)' }} />
+                    ),
                   },
-                }}
-              />
-              <Chip
-                icon={<SmartToyRoundedIcon />}
-                label="AI Connected"
-                color="success"
-                sx={{
-                  display: { xs: 'none', lg: 'inline-flex' },
-                  height: 32,
-                  '& .MuiChip-icon': { color: 'success.main' },
-                  backgroundColor: (muiTheme) => alpha(muiTheme.palette.success.main, 0.12),
                 }}
               />
               <IconButton aria-label="search expenses" sx={{ display: { xs: 'inline-flex', sm: 'none' } }}>
                 <SearchRoundedIcon />
               </IconButton>
+            </Stack>
+
+            <Stack direction="row" spacing={1.25} alignItems="center" sx={{ justifyContent: 'flex-end' }}>
+              <Button
+                variant="outlined"
+                startIcon={<CalendarTodayRoundedIcon />}
+                endIcon={<KeyboardArrowDownRoundedIcon />}
+                sx={{ display: { xs: 'none', md: 'inline-flex' }, bgcolor: 'background.paper' }}
+              >
+                This Month
+              </Button>
+              <Chip
+                icon={<SmartToyRoundedIcon />}
+                label={pageTitle}
+                variant="outlined"
+                sx={{ display: { xs: 'none', xl: 'inline-flex' } }}
+              />
               <Button
                 component={NavLink}
                 to="/expenses/add"
@@ -247,11 +270,12 @@ function AppLayout() {
                   <NotificationsNoneRoundedIcon />
                 </Badge>
               </IconButton>
-              <Stack direction="row" spacing={1.25} alignItems="center">
-                <Avatar sx={{ width: 34, height: 34, bgcolor: 'secondary.main', fontSize: 14 }}>M</Avatar>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Avatar sx={{ width: 36, height: 36, bgcolor: 'secondary.main', fontSize: 14 }}>M</Avatar>
                 <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
                   <Typography variant="subtitle2">Mohan</Typography>
                 </Box>
+                <KeyboardArrowDownRoundedIcon sx={{ display: { xs: 'none', lg: 'block' }, color: 'text.secondary', fontSize: 18 }} />
               </Stack>
             </Stack>
           </Toolbar>

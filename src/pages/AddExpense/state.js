@@ -137,12 +137,12 @@ export function useAddExpenseState() {
 
     return () => clearTimeout(timeoutId)
   }, [
+    categorizeExpenseMutation,
     form.amount,
     form.isAiCategorized,
     form.merchant,
     form.notes,
     form.paymentMethod,
-    categorizeExpenseMutation.isPending,
   ])
 
   const aiSuggestion = useMemo(() => {
