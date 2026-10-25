@@ -12,7 +12,7 @@ const defaultSuggestions = [
 export function useAIAssistantState() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
-  const { selectedProviderId, showError } = useAIProvider()
+  const { selectedProviderId, providerStatuses, showError } = useAIProvider()
 
   const mutation = useMutation({
     mutationFn: askAssistant,
@@ -24,6 +24,7 @@ export function useAIAssistantState() {
           text: data.answer,
           provider: data.provider || selectedProviderId,
           source: data.source || 'mock',
+          rag: data.rag || null,
         },
       ])
     },
@@ -41,6 +42,8 @@ export function useAIAssistantState() {
     mutation.mutate({ provider: selectedProviderId, message: question })
   }
 
+  const providerStatus = providerStatuses.find((provider) => provider.id === selectedProviderId) || null
+
   return {
     suggestedQuestions: defaultSuggestions,
     input,
@@ -48,6 +51,7 @@ export function useAIAssistantState() {
     messages,
     sendQuestion,
     selectedProviderId,
+    providerStatus,
     isLoading: mutation.isPending,
     isError: mutation.isError,
   }

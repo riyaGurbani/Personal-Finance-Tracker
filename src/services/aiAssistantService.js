@@ -5,7 +5,7 @@ export async function getAiProviderStatuses() {
   return response.data
 }
 
-export async function askAssistant({ provider, message }) {
-  const response = await api.post('/ai/chat', { provider, message })
+export async function askAssistant({ provider, message, userId = 'riya-demo' }) {
+  const response = await api.post('/ai/assistant', { provider, message, userId })
   return response.data
 }

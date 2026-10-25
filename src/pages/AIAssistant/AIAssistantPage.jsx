@@ -1,6 +1,6 @@
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import SendRoundedIcon from '@mui/icons-material/SendRounded'
-import { Box, Button, Chip, Grid, Stack, TextField, Typography, Paper } from '@mui/material'
+import { Alert, Box, Button, Chip, Divider, Grid, Stack, TextField, Typography, Paper } from '@mui/material'
 import PageIntro from '../../components/common/PageIntro.jsx'
 import SectionCard from '../../components/common/SectionCard.jsx'
 import { useAIAssistantState } from './state.js'
@@ -25,21 +25,82 @@ function AssistantIllustration() {
   )
 }
 
+function RetrievalPanel({ rag }) {
+  if (!rag) {
+    return null
+  }
+
+  const knowledgeMatches = rag.retrieval?.knowledgeMatches || []
+  const expenseContextSections = rag.retrieval?.expenseContextSections || []
+  const embeddingModel = rag.retrieval?.embeddingModel || 'unknown'
+  const generationProvider = rag.retrieval?.generationProvider || 'unknown'
+  const retrievalMode = rag.retrieval?.retrievalMode || 'shared-rag'
+
+  return (
+    <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+      <Divider />
+      <Typography variant="caption" color="text.secondary">
+        RAG context used for this answer
+      </Typography>
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        <Chip label={`Generation: ${generationProvider}`} size="small" variant="outlined" />
+        <Chip label={`Retrieval: ${retrievalMode}`} size="small" variant="outlined" />
+        <Chip label={`Embeddings: ${embeddingModel}`} size="small" variant="outlined" />
+      </Stack>
+      <Stack spacing={0.75}>
+        {expenseContextSections.map((section) => (
+          <Typography key={section} variant="caption" color="text.secondary">
+            • {section}
+          </Typography>
+        ))}
+      </Stack>
+      {knowledgeMatches.length > 0 ? (
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          {knowledgeMatches.map((match) => (
+            <Chip
+              key={`${match.source}-${match.id}`}
+              label={`${match.title} · ${match.source}`}
+              size="small"
+              variant="outlined"
+            />
+          ))}
+        </Stack>
+      ) : (
+        <Typography variant="caption" color="text.secondary">
+          No knowledge-base match was retrieved for this question.
+        </Typography>
+      )}
+    </Stack>
+  )
+}
+
 function AIAssistantPage() {
-  const { suggestedQuestions, input, setInput, messages, sendQuestion, isLoading, selectedProviderId } = useAIAssistantState()
+  const {
+    suggestedQuestions,
+    input,
+    setInput,
+    messages,
+    sendQuestion,
+    isLoading,
+    selectedProviderId,
+    providerStatus,
+  } = useAIAssistantState()
 
   return (
     <Stack spacing={3}>
       <PageIntro
         title="AI Expense Assistant"
-        description="Ask natural-language questions about your spending, categories, trends, and financial guidance."
+        description="Ask natural-language questions about your spending, categories, trends, and financial guidance with RAG-backed finance context."
       />
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 7 }}>
-          <SectionCard title="Hello Riya 👋" subtitle="I can analyze your expenses history, explain spending patterns, compare budgets, and provide financial guidance.">
+          <SectionCard title="Hello Riya 👋" subtitle="I can analyze your expenses history, retrieve relevant finance guidance, compare budgets, and provide grounded financial answers.">
             <Stack spacing={3}>
-               <Stack spacing={1.5}>
+              <Alert severity="info" variant="outlined">
+                Using <strong>{providerStatus?.label || selectedProviderId}</strong> for generation, <strong>{providerStatus?.retrievalMode || 'shared-rag'}</strong> for retrieval, and <strong>{providerStatus?.embeddingModel || 'hash-fallback'}</strong> embeddings.
+              </Alert>
+              <Stack spacing={1.5}>
                 <Typography variant="subtitle2">Suggested questions</Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   {suggestedQuestions.map((question) => (
@@ -99,6 +160,7 @@ function AIAssistantPage() {
                            sx={{ mt: 1, bgcolor: 'background.paper' }}
                          />
                        ) : null}
+                       {msg.role === 'assistant' ? <RetrievalPanel rag={msg.rag} /> : null}
                      </Box>
                    </Stack>
                  ))}
