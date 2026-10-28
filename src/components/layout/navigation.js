@@ -15,7 +15,7 @@ export const navigationItems = [
   },
   {
     label: 'Add Expense',
-    path: '/expenses/add',
+    path: '/expenses-add',
     icon: AddCircleOutlineRoundedIcon,
     title: 'Add Expense',
   },

@@ -31,7 +31,13 @@ function AIInsightsPanel({ insights = [], generatedAt }) {
       title="AI insights"
       subtitle={generatedAt ? `Updated ${generatedAt}` : 'Latest recommendations based on your spending'}
       action={
-        <Button component={RouterLink} to="/ai-insights" variant="text" size="small">
+        <Button
+          component={RouterLink}
+          to="/ai-insights"
+          variant="text"
+          size="small"
+          sx={{ alignItems: 'right', borderRadius: 0.5 }}
+        >
           View all
         </Button>
       }
@@ -54,7 +60,7 @@ function AIInsightsPanel({ insights = [], generatedAt }) {
               alignItems="flex-start"
               sx={{
                 p: 2,
-                borderRadius: 4,
+                borderRadius: 1,
                 backgroundColor: 'rgba(255,255,255,0.78)',
                 border: '1px solid rgba(148,163,184,0.12)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -68,7 +74,7 @@ function AIInsightsPanel({ insights = [], generatedAt }) {
                 sx={{
                   width: 44,
                   height: 44,
-                  borderRadius: 3,
+                  borderRadius: 1,
                   display: 'grid',
                   placeItems: 'center',
                   background: (theme) => alpha(theme.palette.primary.main, 0.08),

@@ -14,7 +14,7 @@ function AppRoutes() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/expenses/add" element={<AddExpensePage />} />
+        <Route path="/expenses-add" element={<AddExpensePage />} />
         <Route path="/expenses" element={<ExpenseHistoryPage />} />
         <Route path="/ai-assistant" element={<AIAssistantPage />} />
         <Route path="/ai-insights" element={<AIInsightsPage />} />

@@ -15,7 +15,7 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
     >
       <CardContent sx={{ p: 3 }}>
         <Stack spacing={2.25}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
+          <Stack direction="row" sx={{justifyContent: 'space-between'}} >
             <Stack spacing={0.75} sx={{ minWidth: 0 }}>
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
                 {title}
@@ -25,8 +25,6 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
               </Typography>
             </Stack>
             <Stack
-              alignItems="center"
-              justifyContent="center"
               sx={{
                 width: 52,
                 height: 52,
@@ -35,6 +33,12 @@ function SummaryMetricCard({ title, value, change, icon, color = 'primary.main' 
                 backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
                 boxShadow: (theme) => `inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`,
                 flexShrink: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+                '& .MuiSvgIcon-root': {
+                  fontSize: 24,
+                  display: 'block',
+                },
               }}
             >
               <IconComponent />

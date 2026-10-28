@@ -94,7 +94,7 @@ function DashboardPage() {
         topCategory={overview.topCategory}
         potentialSavings={overview.potentialSavings}
         onAddExpense={() => {
-          window.location.href = '/expenses/add'
+          window.location.href = '/expenses-add'
         }}
         onAskAi={() => {
           window.location.href = '/ai-assistant'
@@ -108,40 +108,10 @@ function DashboardPage() {
       />
 
       <Grid container spacing={3}>
-        {summaryCards.map((card) => (
-          <Grid key={card.title} size={{ xs: 12, sm: 6, xl: 3 }}>
-            <SummaryMetricCard {...card} />
-          </Grid>
-        ))}
-      </Grid>
-
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, lg: 7 }}>
-          <SpendingTrendCard data={trend.data} totalLabel={overview.totalExpensesLabel} />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 5 }}>
-          <BudgetHealthCard
-            budgetLabel={overview.budgetLabel}
-            budgetUsedPercentage={overview.budgetUsedPercentage}
-            categoryBreakdown={categoryBreakdown.items}
-          />
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, lg: 5 }}>
-          <CategoryBreakdownCard items={categoryBreakdown.items} totalLabel={overview.totalExpensesLabel} />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 7 }}>
-          <RecentTransactionsCard transactions={recentTransactions} />
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, lg: 5 }}>
+        <Grid>
           <AIInsightsPanel insights={aiInsights} generatedAt={formattedGeneratedAt} />
         </Grid>
-        <Grid size={{ xs: 12, lg: 7 }}>
+        {/* <Grid size={{ xs: 12, lg: 7 }}>
           <Box
             sx={{
               p: { xs: 2.5, md: 3 },
@@ -163,6 +133,36 @@ function DashboardPage() {
               </Button>
             </Stack>
           </Box>
+        </Grid> */}
+      </Grid>
+
+      <Grid container spacing={3}>
+        {summaryCards.map((card) => (
+          <Grid key={card.title} size={{ xs: 12, sm: 6, xl: 3 }}>
+            <SummaryMetricCard {...card} />
+          </Grid>
+        ))}
+      </Grid>
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, lg: 5 }}>
+          <BudgetHealthCard
+            budgetLabel={overview.budgetLabel}
+            budgetUsedPercentage={overview.budgetUsedPercentage}
+            categoryBreakdown={categoryBreakdown.items}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 7 }}>
+          <RecentTransactionsCard transactions={recentTransactions} />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, lg: 7 }}>
+          <SpendingTrendCard data={trend.data} totalLabel={overview.totalExpensesLabel} />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 5 }}>
+          <CategoryBreakdownCard items={categoryBreakdown.items} totalLabel={overview.totalExpensesLabel} />
         </Grid>
       </Grid>
     </Stack>
