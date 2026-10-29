@@ -99,42 +99,7 @@ function DashboardPage() {
         onAskAi={() => {
           window.location.href = '/ai-assistant'
         }}
-        onSetBudget={() => {
-          window.location.href = '/settings'
-        }}
-        onViewReports={() => {
-          window.location.href = '/ai-insights'
-        }}
       />
-
-      <Grid container spacing={3}>
-        <Grid>
-          <AIInsightsPanel insights={aiInsights} generatedAt={formattedGeneratedAt} />
-        </Grid>
-        {/* <Grid size={{ xs: 12, lg: 7 }}>
-          <Box
-            sx={{
-              p: { xs: 2.5, md: 3 },
-              borderRadius: 6,
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,244,255,0.96) 100%)',
-              border: '1px solid rgba(219,228,255,0.95)',
-              boxShadow: '0px 16px 40px rgba(76, 111, 255, 0.08)',
-            }}
-          >
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent="space-between">
-              <Stack spacing={0.75}>
-                <Typography variant="h6">Stay on top of your goals</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Set savings goals and let AI help you reach them faster.
-                </Typography>
-              </Stack>
-              <Button variant="contained" component={RouterLink} to="/settings">
-                Create a goal
-              </Button>
-            </Stack>
-          </Box>
-        </Grid> */}
-      </Grid>
 
       <Grid container spacing={3}>
         {summaryCards.map((card) => (

@@ -29,7 +29,11 @@ function AIInsightsPanel({ insights = [], generatedAt }) {
   return (
     <SectionCard
       title="AI insights"
-      subtitle={generatedAt ? `Updated ${generatedAt}` : 'Latest recommendations based on your spending'}
+      subtitle={
+        generatedAt
+          ? `Updated ${generatedAt}`
+          : 'Recommendations based on your recent spending patterns'
+      }
       action={
         <Button
           component={RouterLink}
@@ -47,12 +51,12 @@ function AIInsightsPanel({ insights = [], generatedAt }) {
         <Stack alignItems="center" justifyContent="center" spacing={1.5} sx={{ minHeight: 240, textAlign: 'center' }}>
           <AutoAwesomeRoundedIcon color="disabled" />
           <Typography variant="body2" color="text.secondary">
-            AI insights will appear here after enough spending data is available.
+           AI insights will appear here after enough spending data is available.
           </Typography>
         </Stack>
       ) : (
         <Stack spacing={1.5}>
-          {insights.map((insight) => (
+           {insights.map((insight) => (
             <Stack
               key={insight.id}
               direction="row"
@@ -85,8 +89,18 @@ function AIInsightsPanel({ insights = [], generatedAt }) {
               </Box>
               <Stack spacing={0.75} sx={{ minWidth: 0, flex: 1 }}>
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
-                  <Chip label={insight.source || 'AI'} size="small" variant="outlined" />
-                  <Chip label={insight.severity || 'info'} size="small" color={severityColorMap[insight.severity] || 'default'} />
+                   <Chip label={insight.source === 'ai' ? 'AI-generated' : 'Derived from data'} size="small" variant="outlined" />
+                   <Chip
+                     label={
+                       insight.severity === 'high'
+                         ? 'High impact'
+                         : insight.severity === 'medium'
+                         ? 'Needs attention'
+                         : 'Informational'
+                     }
+                     size="small"
+                     color={severityColorMap[insight.severity] || 'default'}
+                   />
                 </Stack>
                 <Typography variant="subtitle2">{insight.title}</Typography>
                 <Typography variant="body2" color="text.secondary">
